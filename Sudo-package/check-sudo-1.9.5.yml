@@ -1,0 +1,79 @@
+- name: CHECK SUDO VERSION - UBUNTU/CENTOS
+  hosts: all
+  become: true
+  remote_user: admin
+  tasks:
+    - when: >-
+        ansible_distribution == 'Ubuntu' or ansible_distribution_major_version
+        == '18' or ansible_distribution_major_version == '20'
+      name: 1. UBUNTU- check sudo version -- BEFORE UPDATE
+      shell: sudo apt show sudo| grep -i version
+      register: output1
+    - when: >-
+        ansible_distribution == 'Ubuntu' or ansible_distribution_major_version
+        == '18' or ansible_distribution_major_version == '20'
+      debug:
+        msg: '{{output1.stdout_lines}}'
+    - when: >-
+        ansible_distribution == 'Ubuntu' or ansible_distribution_major_version
+        == '18' or ansible_distribution_major_version == '20'
+      name: 3. UBUNTU- check sudo-ubuntu is at the latest version
+      get_url:
+        url: >-
+          https://github.com/sudo-project/sudo/releases/download/SUDO_1_9_5p2/sudo_1.9.5-3_ubu1804_amd64.deb
+        dest: '/tmp/sudo_1.9.5-3_ubu1804_amd64.deb  '
+    - when: >-
+        ansible_distribution == 'Ubuntu' or ansible_distribution_major_version
+        == '18' or ansible_distribution_major_version == '20'
+      name: 4. UBUNTU- update sudo package to the latest version
+      apt:
+        deb: /tmp/sudo_1.9.5-3_ubu1804_amd64.deb
+        only_upgrade: 'yes'
+    - when: >-
+        ansible_distribution == 'Ubuntu' or ansible_distribution_major_version
+        == '18' or ansible_distribution_major_version == '20'
+      name: 5. UBUNTU- check sudo version--AFTER UPDATE
+      shell: sudo apt show sudo| grep -i version
+      register: output2
+      ignore_errors: 'yes'
+    - when: >-
+        ansible_distribution == 'Ubuntu' or ansible_distribution_major_version
+        == '18' or ansible_distribution_major_version == '20'
+      debug:
+        msg: '{{output2.stdout_lines}}'
+    - when: >-
+        ansible_distribution_major_version == '7' or ansible_distribution ==
+        'CentOS'
+      name: 6. CENTOS- output sudo version--BEFORE UPDATE
+      shell: sudo rpm -qa | grep -i sudo
+      register: output3
+    - when: >-
+        ansible_distribution_major_version == '7' or ansible_distribution ==
+        'CentOS'
+      debug:
+        msg: '{{output3.stdout_lines}}'
+    - when: >-
+        ansible_distribution_major_version == '7' or ansible_distribution ==
+        'CentOS'
+      name: 7. CENTOS- download rpm
+      get_url:
+        url: >-
+          https://github.com/sudo-project/sudo/releases/download/SUDO_1_9_5p2/sudo-1.9.5-3.el7.x86_64.rpm
+        dest: /tmp/sudo-1.9.5-3.el7.x86_64.rpm
+    - when: >-
+        ansible_distribution_major_version == '7' or ansible_distribution ==
+        'CentOS'
+      name: 8. UPDATE sudo-centos
+      shell: /usr/bin/rpm -Uvh /tmp/sudo-1.9.5-3.el7.x86_64.rpm
+    - when: >-
+        ansible_distribution_major_version == '7' or ansible_distribution ==
+        'CentOS'
+      name: 9. CHECK sudo version--AFTER UPDATE
+      shell: sudo rpm -qa | grep -i sudo
+      register: output4
+      ignore_errors: 'yes'
+    - when: >-
+        ansible_distribution_major_version == '7' or ansible_distribution ==
+        'CentOS'
+      debug:
+        msg: '{{output4.stdout_lines}}'
