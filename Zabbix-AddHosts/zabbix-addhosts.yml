@@ -1,0 +1,39 @@
+- name: Zabbix-ADD HOSTS
+  hosts: X.X.X.X
+  become: yes
+  become_method: sudo
+  remote_user: admin
+  become_user: root
+  tasks:
+  - name: Create a new host or update an existing host's info
+    local_action:
+      module: community.zabbix.zabbix_host
+      server_url: http://X.X.X.X/zabbix/
+      login_user: Admin
+      login_password: ZABBIXPASSWORD
+      host_name: "{{ hostname }}"
+      visible_name: "{{ hostname }}"
+      description: "{{ hostname }}"
+      host_groups:
+        - ICMP-Hosts
+        - Linux servers
+      link_templates:
+        - Template OS Linux by Zabbix agent
+        - Template Module ICMP Ping
+        - Template App SSH Service
+      status: enabled
+      state: present
+      inventory_mode: automatic
+      interfaces:
+        - type: 1
+          main: 1
+          useip: 1
+          ip: "{{ hostip }}"
+          dns: ""
+          port: "10050"
+        - type: 4
+          main: 1
+          useip: 1
+          ip: "{{ hostip }}"
+          dns: ""
+          port: "12345"
